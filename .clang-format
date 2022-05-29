@@ -1,0 +1,23 @@
+# Modified Google C++ Style Guide
+BasedOnStyle: Google
+
+# `int& x`, not `int &x`
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+# Function calls that don't fit
+#   should break after ...(
+#   and have one argument per line
+AlignAfterOpenBracket: AlwaysBreak
+BinPackArguments: false
+BinPackParameters: false
+PenaltyBreakBeforeFirstCallParameter: 0
+ContinuationIndentWidth: 6
+AllowAllArgumentsOnNextLine: false
+# AllowAllParametersOfDeclarationOnNextLine: false
+# PenaltyBreakOpenParenthesis: 0
+
+# Okay, but if that doesn't work,
+#   fucking NEVER put the whole thing
+#   on the next line with a blank =
+PenaltyBreakAssignment: 99999

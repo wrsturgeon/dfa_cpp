@@ -1,0 +1,22 @@
+# Mac finder information
+.DS_Store
+
+# Debug symbols
+*.dSYM
+
+# Visual Studio Code settings
+.vscode/
+
+# Fuck no
+data/
+
+# Binary executables
+bin/
+
+# Output images
+out/
+
+# Screen size
+src/size.hpp
+
+config/
