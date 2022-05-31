@@ -16,7 +16,5 @@ bin/
 # Output images
 out/
 
-# Screen size
-src/size.hpp
-
+# Screen size & other compile-time (but system-dependent) constants
 config/
