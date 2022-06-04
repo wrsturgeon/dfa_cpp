@@ -37,25 +37,27 @@ if [ "$1" = "debug" ]; then
     echo "Compiling with debug info"
     export ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)
     export DEBUG="-g -fsanitize=address" # -D_FORTIFY_SOURCE=2
-    # export OPTIM="-Og"
-else
-    export OPTIM="-O3 -ffast-math -mllvm -polly -mllvm -polly-vectorizer=stripmine"
 fi
 
 # Auto-format
 find src -name '*.*' | xargs clang-format -i --style=file
 
-# Update Eigen
-git submodule update --remote || echo "Couldn't update Eigen; are you connected to wifi?"
+# Check internet connection
+if wget -q --spider http://ismycomputeron.com; then
 
-# Pull xoshiro256+
-echo -e "#ifndef UTIL_XOSHIRO_HPP_\n#define UTIL_XOSHIRO_HPP_\n\n//NOTE: THIS IS NOT MINE, just wgetting it each compilation\n//   Source: https://prng.di.unimi.it/xoshiro256plus.c\n\nnamespace xoshiro {\n\n// Clang doesn't like jump()'s different-sign comparison\n#pragma clang diagnostic push\n#pragma clang diagnostic ignored \"-Wsign-compare\"\n" > src/util/xoshiro.hpp
-wget https://prng.di.unimi.it/xoshiro256plus.c -O ->> src/util/xoshiro.hpp
-echo -e "\n#pragma clang diagnostic pop\n\n} // namespace xoshiro\n\n#endif // UTIL_XOSHIRO_HPP_" >> src/util/xoshiro.hpp
+  # Update Eigen
+  git submodule update --remote
+
+  # Pull xoshiro256+
+  echo -e "#ifndef UTIL_XOSHIRO_HPP_\n#define UTIL_XOSHIRO_HPP_\n\n//NOTE: THIS IS NOT MINE, just wgetting it each compilation\n//   Source: https://prng.di.unimi.it/xoshiro256plus.c\n\nnamespace xoshiro {\n\n// Clang doesn't like jump()'s different-sign comparison\n#pragma clang diagnostic push\n#pragma clang diagnostic ignored \"-Wsign-compare\"\n" > src/util/xoshiro.hpp
+  wget https://prng.di.unimi.it/xoshiro256plus.c -O ->> src/util/xoshiro.hpp
+  echo -e "\n#pragma clang diagnostic pop\n\n} // namespace xoshiro\n\n#endif // UTIL_XOSHIRO_HPP_" >> src/util/xoshiro.hpp
+
+else echo "Can't connect to the Internet (or ismycomputeron.com is down lol)"; fi
 
 # If we ever want to put OpenCV back in:
 # $(pkg-config --cflags --libs opencv4) generates all clang flags we need
-COMPILE_CMD="$COMPILER src/main.cpp -o bin/main -std=$STANDARD $DEBUG $OPTIM -include src/util/${OS}/screenshot.hpp -pedantic -Wall -Wextra -Werror"
+COMPILE_CMD="$COMPILER src/main.cpp -o bin/main$1 -std=$STANDARD $DEBUG -march=native -O3 -ffast-math -mllvm -polly -mllvm -polly-vectorizer=stripmine -include src/util/${OS}/screenshot.hpp -pedantic -Wall -Wextra -Werror -Wno-c99-extensions" # -Wno-c99-extensions for Eigen
 
 mkdir -p bin
 rm -rf out

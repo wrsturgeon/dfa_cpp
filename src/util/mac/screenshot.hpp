@@ -62,25 +62,23 @@ screen::type screen::shot() {
   // Let's manually take 1 every screen::stride pixels in each dimension.
   uint8_t const* bptr = std::move(CFDataGetBytePtr(data));
   if (!rnd) rnd = xoshiro::next();  // technically inaccurate but good enough
-  // uint8_t oy = rnd & screen::stride_mask;
-  // rnd >>= screen::lgs;
-  // uint8_t ox = rnd & screen::stride_mask;
-  // rnd >>= screen::lgs;
-  uint8_t oy = 0;
-  uint8_t ox = 0;
+  uint8_t oy = rnd & screen::stride_mask;
+  rnd >>= screen::lgs;
+  uint8_t ox = rnd & screen::stride_mask;
+  rnd >>= screen::lgs;
   screen::type t;
   // It's gotta take a fucking long time caching for row- to column-major...
   // Unfortunately it seems like TensorMap<TensorFixedSize> is broken
-  bptr += (ox * screen::c_post) +
-          (oy * screen::w_post * screen::c_post);  // TODO: should be constexpr
   // Eigen requires long
   for (long y = 0; y < static_cast<long>(screen::h_post); ++y) {
     for (long x = 0; x < static_cast<long>(screen::w_post); ++x) {
+#pragma unroll
       for (long c = 0; c < static_cast<long>(screen::c_post); ++c) {
+        // size_t vec = (y << screen::lgs | oy) * screen::w +
+        //              (x << screen::lgs | ox);
         t(y, x, c) = bptr
-              [((((y << screen::lgs) + oy) * screen::w + (x << screen::lgs) +
-                 ox)
-                << 2) +
+              [(((y << screen::lgs | oy) * screen::w + (x << screen::lgs | ox))
+                << 2) |
                ((screen::c_post - 1) - c)];
       }
     }
