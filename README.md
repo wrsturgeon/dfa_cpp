@@ -1,1 +1,1 @@
-Work-in-progress source code to fly drones by _predicting individual pixel values_ as a function of time.
+Work-in-progress source code to fly drones by predicting individual pixels as a function of time.
