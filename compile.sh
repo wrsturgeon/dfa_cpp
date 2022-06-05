@@ -25,8 +25,7 @@ else
 fi
 
 # Configure
-if [ ! -f "config/sizes.hpp" ]; then
-    mkdir -p config
+if [ ! -f "config.hpp" ]; then
     clang++ -o configure src/util/${OS}/configure.cpp $EXTRA_FLAGS
     ./configure
     rm configure
@@ -40,7 +39,7 @@ if [ "$1" = "debug" ]; then
 fi
 
 # Auto-format
-find src -name '*.*' | xargs clang-format -i --style=file
+find src -name '*.hpp' -o -name '*.cpp' | xargs clang-format -i --style=file
 
 # Check internet connection
 if wget -q --spider http://ismycomputeron.com; then
@@ -57,7 +56,7 @@ else echo "Can't connect to the Internet (or ismycomputeron.com is down lol)"; f
 
 # If we ever want to put OpenCV back in:
 # $(pkg-config --cflags --libs opencv4) generates all clang flags we need
-COMPILE_CMD="$COMPILER src/main.cpp -o bin/main$1 -std=$STANDARD $DEBUG -march=native -O3 -ffast-math -mllvm -polly -mllvm -polly-vectorizer=stripmine -include src/util/${OS}/screenshot.hpp -pedantic -Wall -Wextra -Werror -Wno-c99-extensions" # -Wno-c99-extensions for Eigen
+COMPILE_CMD="$COMPILER src/main.cpp -o bin/main$1 -std=$STANDARD $DEBUG -funit-at-a-time -march=native -Ofast -mllvm -polly -mllvm -polly-vectorizer=stripmine -include src/util/${OS}/screenshot.hpp -pedantic -Wall -Wextra -Werror -Wno-c99-extensions" # -Wno-c99-extensions for Eigen
 
 mkdir -p bin
 rm -rf out

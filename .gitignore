@@ -17,4 +17,4 @@ bin/
 out/
 
 # Screen size & other compile-time (but system-dependent) constants
-config/
+config.hpp

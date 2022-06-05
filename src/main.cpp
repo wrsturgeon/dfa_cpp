@@ -3,13 +3,21 @@
 
 #include <iostream>
 
-#include "../config/sizes.hpp"
+#include "../config.hpp"
+#include "util/compiletime.hpp"
+#include "util/xoshiro.hpp"
 
-namespace screen {  // Declaration, no matter what OS (manually included)
+namespace screen {  // Declaration only hardcoded; manually included for your OS
 extern screen::type shot();
 }
 
 int main() {
+  // Manually seed xoshiro256++ with precomputed SplitMix64
+  xoshiro::s[0] = 16294208416658607535LLU;
+  xoshiro::s[1] = 3055647633038352039LLU;
+  xoshiro::s[2] = 7622863033291099422LLU;
+  xoshiro::s[3] = 7333329389124002025LLU;
+
   screen::type cm;
   Eigen::TensorFixedSize<uint8_t, screen::Size, Eigen::RowMajor> rm;
   CGColorSpaceRef cs = CGColorSpaceCreateDeviceRGB();
